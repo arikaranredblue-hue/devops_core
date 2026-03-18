@@ -1,0 +1,55 @@
+
+Project Overview:
+-----------------
+This lab demonstrates practical Linux server monitoring and troubleshooting skills.
+It covers CPU, memory, disk, I/O, process, service, network, and log monitoring using
+built-in Linux commands. No additional tools are required, making it suitable for
+manual hands-on practice and later automation with Bash scripts.
+
+Key Objectives:
+---------------
+1. Monitor system resources (CPU, Memory, Disk, I/O)
+2. Identify top resource-consuming processes
+3. Monitor and manage running services
+4. Check network connectivity and open ports
+5. Analyze system and service logs for troubleshooting
+6. Document findings for portfolio and LinkedIn showcase
+
+Step-by-Step Workflow:
+----------------------
+1. **Environment Setup**
+   - Ensure sudo access
+   - Install optional monitoring tools (htop, iftop, iotop) if desired
+
+2. **System Resource Monitoring**
+   - CPU & Memory:
+     * `top` → interactive view of processes, %CPU, %MEM
+     * `ps -eo pid,user,cmd,%cpu,%mem --sort=-%cpu | head -n 4` → top 3 CPU processes
+     * `ps -eo pid,user,cmd,%cpu,%mem --sort=-%mem | head -n 4` → top 3 memory processes
+     * `vmstat 2 5` → snapshot of CPU, memory, swap, and I/O
+   - Disk Usage:
+     * `df -h` → check filesystem usage
+     * `du -sh /home/* /var/*` → find largest directories
+   - Disk I/O:
+     * `vmstat 2 5` → monitor disk read/write
+     * `iostat -x 1 5` (optional) → detailed disk I/O metrics
+
+3. **Process & Service Monitoring**
+   - List all processes: `ps aux`
+   - Check running services: `systemctl list-units --type=service --state=running`
+   - Start/Stop/Restart services: `systemctl start|stop|restart <service>`
+   - Enable/Disable service at boot: `systemctl enable|disable <service>`
+   - Kill misbehaving processes: `kill -9 <PID>`
+
+4. **Network Monitoring**
+   - Check listening ports: `ss -tulnp`
+   - Summarize network connections: `ss -s`
+   - Test connectivity: `ping`, `traceroute`
+   - Check interfaces: `ip a`
+
+
+
+Notes:
+------
+- No external tools required; all monitoring can be done with built-in commands.
+- Optional: later automation using Bash scripts can replicate these steps.
