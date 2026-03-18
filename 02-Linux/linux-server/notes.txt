@@ -1,0 +1,128 @@
+# Linux Nginx Web Server Setup + Custom Website + Secure User
+
+## Update System & Install Nginx
+
+# RHEL/CentOS/Fedora
+dnf update -y
+dnf install -y nginx
+
+Explanation:
+- Updates all system packages
+- Installs Nginx web server
+
+---
+
+## Deploy Custom Website
+
+# Navigate to web root
+cd /usr/share/nginx/html
+
+# Backup default page
+mv index.html /root/hello/index.html.bak
+
+# Create new index.html
+vim index.html
+
+# index.html content:
+<html>
+  <head>
+    <title>DevOps Practice</title>
+  </head>
+  <body>
+    <h1>Hello! I am Arikaran Redblue</h1>
+    <p>Learning DevOps + Nginx in practice!</p>
+  </body>
+</html>
+
+# Save & exit: ESC → :wq
+# Set correct ownership & permissions
+chown nginx:nginx index.html
+chmod 644 index.html
+
+Explanation:
+- Backup default page
+- Create custom HTML page
+- chown ensures Nginx can read the file
+- chmod 644 allows owner write, others read
+
+---
+
+## Create Admin User for Website Management
+
+useradd -m -s /bin/bash devadmin
+passwd devadmin
+chage -m 3 -M 3 -I 7 -W 6 -E 2026-12-25 devadmin
+
+Explanation:
+- -m → creates home directory
+- -s /bin/bash → sets shell
+- chage → configures password policy and expiry
+
+---
+
+## Give User Permissions on Web Directory
+
+chown -R devadmin:devadmin /usr/share/nginx/html
+chmod -R 655 /usr/share/nginx/html
+
+Explanation:
+- Gives devadmin ownership of web files
+- chmod 655 → owner can read/write/execute, others can read/execute
+
+---
+
+## Configure Sudo for Nginx Management
+
+visudo
+
+# Add line:
+devadmin ALL=(ALL) NOPASSWD: /bin/systemctl status nginx, /bin/systemctl enable --now nginx, /bin/systemctl disable --now nginx
+
+Explanation:
+- Allows devadmin to manage Nginx without full root access
+- NOPASSWD → no password prompt for these commands
+
+---
+
+##  Disable Root SSH Login
+
+vi /etc/ssh/sshd_config
+# Set:
+PermitRootLogin no
+sudo systemctl reload sshd
+
+Explanation:
+- Improves security by preventing root SSH login
+
+---
+
+## Make Website Accessible from Windows
+
+# Change VM network to bridge mode (VMware settings)
+# Open firewall ports
+firewall-cmd --permanent --add-service=http
+firewall-cmd --permanent --add-service=https
+firewall-cmd --reload
+
+Explanation:
+- Bridge mode allows VM to get LAN IP
+- HTTP/HTTPS ports must be open for access from other machines
+
+---
+
+## 8️Test Website
+
+# Open browser on Windows or another machine
+http://<VM-IP>
+
+# You should see your custom Nginx page
+
+---
+
+### Notes
+
+- Always backup original pages
+- Use real files in /usr/share/nginx/html, avoid symlinks
+- Standard permissions: directories 755, files 644
+- Reload Nginx after changes: systemctl reload nginx
+- Always confirm which ports Nginx listens on before opening firewall
